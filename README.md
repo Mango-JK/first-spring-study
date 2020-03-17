@@ -1,4 +1,6 @@
-## 🚩 Spring 개념잡기 _ start by 2020-03-17
+## 🚩 Spring 개념잡기               start _ 2020-03-17
+
+
 
 ##### 자바 스프링 프레임워크(renew ver.) - 신입 프로그래머를 위한 강좌
 
@@ -6,32 +8,139 @@
 
 
 
-## 🙆 실습 코드와 개념 정리
 
-### 게시판 기능
+
+## :heavy_check_mark: 4강 ( pom.xml 정의, applicationContext, Bean )
+
+### 1. 기본 프로젝트 생성
+
+​	1-1 기본 Maven 프로젝트 생성 ( new -> Maven Project )
+
+
+
+​	1-2 pom.xml 작성
+
+
+
+```java
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>spring4</groupId>
+  <artifactId>testPjt</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.1.0.RELEASE</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>utf-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+  
+</project>
+```
+
+
+
+이곳에서 기본 pom.xml파일에 
+
+두 가지,  org.springframework와 maven-compiler-plugin을 추가해주었다.
+
+
+
+:soon:   plugin을 추가해준 뒤 [ Maven -> Update Project ] 를 진행해준다.
+
+:soon:  ​ 가장 기본의 Maven 프로젝트 src/main/ java와 resources 생성되며
+
+:soon:   이후 테스트에 사용할 src/test/ java와 resources 생성된다.
+
+
+
+java 폴더는 JAVA 파일들이 위치하는 곳이고 
+
+​	resources 는 자원을 관리하는 폴더로 스프링 설정 파일(XML) 또는 프로퍼티 파일 등을 관리
+
+
+
+
+
+
+
+### 2. applicationContext.xml 작성
+
+
+
+```java
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+	
+		<bean id="tWalk" class="testPjt.TransportationWalk"/>
+	   	
+</beans>
+
+```
+
+
+
+Spring에서 **bean**을 사용해보기 위해 testPjt.TransportationWalk 클래스를 "tWalk" 빈 지정
+
+-->	이후 Main에서 사용해보았다.
+
+
+
+```java
+package testPjt;
+
+import org.springframework.context.support.GenericXmlApplicationContext;
+
+public class MainClass {
+
+	public static void main(String[] args) {
+	
+//		### applicationContext와 bean을 사용하지 않은 경우 ###
+//		TransportationWalk transportationwalk = new TransportationWalk();
+//		transportationwalk.move();
+		
+		
+//		### bean과 applicationContext를 사용한 경우
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext("classpath:applicationContext.xml");
+		TransportationWalk transportationWalk = ctx.getBean("tWalk", TransportationWalk.class);
+		transportationWalk.move();
+		
+		ctx.close();
+	}
+}
+```
+
+
+
+
+
+
+
+
+
+### 1. 게시판 기능
 
 - 게시글 조회
 - 게시글 등록
-- 게시글 수정
-- 게시글 삭제
-
-
-
-```
-API를 만들기 위해 3개의 클래스가 필요합니다.
-
-1. Request 데이터를 받을 Dto
-2. API 요청을 받을 Controller
-3. 트랜잭션, 도메인 기능 간의 순서를 보장하는 Service
-```
-
-
-
-### 회원 기능
-
-- 구글 / 네이버 로그인
-- 로그인한 사용자 글 작성 권한
-- 본인 작성 글에 대한 권한 관리
-
-
+- 
 
