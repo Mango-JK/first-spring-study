@@ -5,7 +5,7 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 public class MainClass {
 
 	public static void main(String[] args) {
-		
+	
 //		### applicationContext와 bean을 사용하지 않은 경우 ###
 //		TransportationWalk transportationwalk = new TransportationWalk();
 //		transportationwalk.move();

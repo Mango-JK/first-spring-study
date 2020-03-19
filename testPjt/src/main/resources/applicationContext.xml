@@ -8,4 +8,3 @@
 		<bean id="tWalk" class="testPjt.TransportationWalk"/>
 	   	
 </beans>
-	   		

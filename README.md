@@ -106,6 +106,8 @@ Spring에서 **bean**을 사용해보기 위해 testPjt.TransportationWalk 클�
 
 
 
+
+
 ```java
 package testPjt;
 
@@ -134,13 +136,45 @@ public class MainClass {
 
 
 
+## :heavy_check_mark: 6강 ( DI_Dependency Injection )
+
+
+
+### * applicationContext Bean
+
+Spring에서 Bean을 생성하고 이용하기 위해서 applicationContext파일을 사용했다.
+
+여기에서 Bean을 생성할 때, Dao를 하나 생성하다면
+
+
+
+```
+<bean id="studentDao" class="ems.member.dao.StudentDao"></bean>
+```
+
+이런식으로 생성해줄 수 있을 것이다.
+
+
+
+이제 이 studentDao를 사용하는 registerService 또는 modifyService와 같이
+
+Dao객체를 이용할 때에는 <constructor-arg>를 사용한다.
+
+
+
+```
+
+<bean id="registerService" class="ems.member.service.StudentRegisterService">
+	<constructor-arg ref="studentDao"></constructor-arg>
+</bean>
+
+<bean id="modifyService" class="ems.member.service.StudentModifyService">
+	<constructor-arg ref="studentDao"></constructor-arg>
+</bean>
+
+```
 
 
 
 
-### 1. 게시판 기능
-
-- 게시글 조회
-- 게시글 등록
-- 
 
