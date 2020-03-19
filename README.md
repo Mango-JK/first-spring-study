@@ -178,3 +178,211 @@ Dao객체를 이용할 때에는 <constructor-arg>를 사용한다.
 
 
 
+## 다양한 의존성 객체 주입 방법
+
+#### 1. 생성자를 이용한 객체 주입
+
+
+
+public StudentRegisterService(StudentDao studentDao) {
+
+​	this.studentDao = studentDao;
+
+}
+
+
+
+```java
+# applicationContext.xml...
+<bean id="studentDao" class="ems.member.dao.StudentDao"></bean>
+
+<bean id="registerService" class="ems.member.service.StudentRegisterService">
+	<constructor-arg ref="studentDao"></constructor-arg>
+</bean>
+```
+
+
+
+```java
+# Main에서...
+GenericXmlApplicationContext ctx = new GenericXmlApplicationContext("classpath:applicationContext.xml");
+
+StudentRegisterService registerService = ctx.getBean("registerService, StudentRegisterService.class")
+```
+
+
+
+
+
+
+
+## :heavy_check_mark: 9강 ( 의존 객체 자동 주입 )
+
+
+
+#### 의존 객체 자동 주입이란 ?
+
+```
+스프링 설정 파일에서 의존 객체를 주입할 때 <constroctor-org> 또는 <property> 태그로 의존 대상 객체를 명시하지 않아도 스프링 컨테이너가 자동으로 필요한 의존 대상 객체를 찾아서 의존 대상 객체가 필요한 객체에 주입해 주는 기능이다.
+
+구현 방법은 @Autowired와 @Resource 어노테이션을 이용해서 쉽게 구현할 수 있다.
+```
+
+
+
+### @Autowired
+
+- 주입하려고 하는 **객체의 타입이 일치**하는 객체를 자동으로 주입한다.
+
+
+
+@Autowired로 의존 객체를 주입시켜주기 위해 xml 파일을 수정한다.
+
+
+
+<context:annotation-config /> 코드 추가,  <beans>코드 조금 추가
+
+```java
+						[ 기존의 xml 파일 ]
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="wordDao" class="com.word.dao.WordDao" />
+	
+	<bean id="registerService" class="com.word.service.WordRegisterService">
+		<constructor-arg ref="wordDao" />
+	</bean>
+	
+	<bean id="searchService" class="com.word.service.WordSearchService">
+		<constructor-arg ref="wordDao" />
+	</bean>
+	
+</beans>
+```
+
+
+
+@Autowired 를 사용하기 위해 변경된 xml
+
+```java
+				[ annotation-config태그 추가, constructor 제거 ]
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ 		http://www.springframework.org/schema/beans/spring-beans.xsd 
+ 		http://www.springframework.org/schema/context 
+ 		http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+
+	<bean id="wordDao" class="com.word.dao.WordDao" >
+	</bean>
+	
+	<bean id="registerService" class="com.word.service.WordRegisterServiceUseAutowired" />
+	
+	<bean id="searchService" class="com.word.service.WordSearchServiceUseAutowired" />
+	
+</beans>
+```
+
+
+
+
+
+@Autowired를 적용한 Service 예시
+
+```java
+package com.word.service;
+
+import com.word.WordSet;
+import com.word.dao.WordDao;
+
+public class WordRegisterService {
+
+	private WordDao wordDao;
+	
+	public WordRegisterService(WordDao wordDao) {
+		this.wordDao = wordDao;
+	}
+	
+	public void register(WordSet wordSet) {
+		String wordKey = wordSet.getWordKey();
+		if(verify(wordKey)) {
+			wordDao.insert(wordSet);
+		} else {
+			System.out.println("The word has already registered.");
+		}
+	}
+	
+	public boolean verify(String wordKey){
+		WordSet wordSet = wordDao.select(wordKey);
+		return wordSet == null ? true : false;
+	}
+	
+	public void setWordDao(WordDao wordDao) {
+		this.wordDao = wordDao;
+	}
+	
+}
+```
+
+
+
+@Autowired를 적용한 소스파일
+
+```java
+package com.word.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import com.word.WordSet;
+import com.word.dao.WordDao;
+
+public class WordRegisterServiceUseAutowired {
+
+    ###
+       	Autowired적용, * 기본 생성자를 만들어줘야 한다. 
+    ###
+        
+	@Autowired
+	private WordDao wordDao;
+	
+	public WordRegisterServiceUseAutowired() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public WordRegisterServiceUseAutowired(WordDao wordDao) {
+		this.wordDao = wordDao;
+	}
+	
+	public void register(WordSet wordSet) {
+		String wordKey = wordSet.getWordKey();
+		if(verify(wordKey)) {
+			wordDao.insert(wordSet);
+		} else {
+			System.out.println("The word has already registered.");
+		}
+	}
+	
+	public boolean verify(String wordKey){
+		WordSet wordSet = wordDao.select(wordKey);
+		return wordSet == null ? true : false;
+	}
+	
+	public void setWordDao(WordDao wordDao) {
+		this.wordDao = wordDao;
+	}
+	
+}
+```
+
