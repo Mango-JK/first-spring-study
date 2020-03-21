@@ -386,3 +386,89 @@ public class WordRegisterServiceUseAutowired {
 }
 ```
 
+
+
+
+
+## :heavy_check_mark: 12강 ( 어노테이션을 이용한 스프링 설정 - I )
+
+
+
+### :heavy_exclamation_mark: XML 파일을 Java 파일로 변경하기
+
+
+
+**@Configuration** 어노테이션을 사용해준다  :arrow_right:  Java 파일을 스프링 xml 설정파일처럼 변경
+
+
+
+**@Bean** 어노테이션을 이용하여 Bean 객체를 설정해준다.
+
+
+
+```java
+import ems.member.dao.StudentDao;
+
+@Configuration
+public class MemberConfig {
+
+     /*
+    	<bean id="studentDao clas="cms.member.dao.StudentDao" />
+    */
+	@Bean
+	public StudentDao studentDao(){
+		return new StudentDao();
+	}
+    
+    
+    /*
+    	<bean id="registerService" class="cms.member.service.StudentRegisterService">
+    		<constructor-arg ref="studentDao"></constructor-arg>
+    	</bean>
+    */
+    @Bean
+	public StudentRegisterService registerService(){
+        return new StudentRegisterService(studentDao());
+    } 
+    
+    /*
+    <bean id="dataBaseConnectionInfoDev" class="ems.member.DataBaseConnectionInfo">
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="userId" value="scott" />
+		<property name="userPw" value="tiger" />
+	</bean>
+    */
+    @Bean
+	public DataBaseConnectionInfo dataBaseConnectionInfoDev() {
+		DataBaseConnectionInfo infoDev = new DataBaseConnectionInfo();
+		infoDev.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:xe");
+		infoDev.setUserId("scott");
+		infoDev.setUserPw("tiger");
+		
+		return infoDev;
+	}
+}
+```
+
+
+
+
+
+### :dart:  제작한 Java Configuration 파일 사용하기
+
+```java
+/*
+	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext("classpath:applicationContext.xml");
+*/
+
+AnnotationConfigApplicationContext ctx = new AnnotaionConfigApplicationContext(MemberConfig1.class);
+```
+
+
+
+
+
+
+
+
+
