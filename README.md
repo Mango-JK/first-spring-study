@@ -144,7 +144,7 @@ public class MainClass {
 
 Spring에서 Bean을 생성하고 이용하기 위해서 applicationContext파일을 사용했다.
 
-여기에서 Bean을 생성할 때, Dao를 하나 생성하다면
+여기에서 Bean을 생성할 때, Dao를 하나 생성한다면
 
 
 
@@ -158,7 +158,7 @@ Spring에서 Bean을 생성하고 이용하기 위해서 applicationContext파�
 
 이제 이 studentDao를 사용하는 registerService 또는 modifyService와 같이
 
-Dao객체를 이용할 때에는 <constructor-arg>를 사용한다.
+Dao객체를 이용할 때에는 < constructor-arg> 를 사용한다.
 
 
 
@@ -461,8 +461,119 @@ public class MemberConfig {
 	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext("classpath:applicationContext.xml");
 */
 
-AnnotationConfigApplicationContext ctx = new AnnotaionConfigApplicationContext(MemberConfig1.class);
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(MemberConfig1.class);
 ```
+
+
+
+
+
+## :heavy_check_mark: 13강 ( 웹 프로그래밍 설계 모델 )
+
+​      **MVC 모델 1 방식과 MVC 모델 2 방식**
+
+
+
+**모델 1 방식**
+
+- JSP로 Service와 Dao 모두 구현
+- 소스에 JSP, Java, Html 태그 코드가 모두 섞여있어 개발은 빠르나 유지보수에 좋지 않음
+
+
+
+**모델 2 방식**
+
+- WAS(웹 어플리케이션 서버)에서 Controller와 Service, DAO, View를 모두 분리함
+- Controller를 만들고, Service에 기능을 구현하여 따로 만듦.
+- DAO를 통해 데이터베이스와 데이터를 요청하며 주고받고
+- View를 이용해 화면을 구현함
+
+
+
+
+
+![Spring 설계구조](C:\Users\user\Desktop\Spring\git\Spring 설계구조.PNG)
+
+
+
+**DispatcherServlet**
+
+1. HandlerMapping 에게 요청을 던져 Controller를 선택받는다.
+2. HandlerAdapter 에게 Controller에서 적합한 Method를 선택받는다.
+3. ViewResolver 에게 가장 적합한 JSP 페이지를 선택받는다.
+4. View에 응답을 생성한다.
+
+
+
+**HandlerMapping** : 요청을 받아 Controller를 선택해준다.
+
+
+
+**HandlerAdapter** : 요청을 받아 해당하는 Controller의 Method를 찾아준다.
+
+
+
+**ViewResolver**  : 요청에 가장 적합한 JSP 페이지를 선택해준다.
+
+
+
+
+
+### DispatcherServlet 설정
+
+web.xml에 서블릿을 매핑시켜준다.
+
+ ( WEB-INF 폴더의 web.xml 파일을 만들고, < servlet> 태그와 <servlet-mapping 태그를 이용한다.)
+
+
+
+![DispatcherServlet 사용](C:\Users\user\Desktop\Spring\git\DispatcherServlet 사용.PNG)
+
+
+
+
+
+:soon:   servlet-context.xml ( 스프링 설정 파일)에 
+
+​						**< annotation-driven />** 태그를 넣어주면
+
+​	해당 Controller를 찾아간다. ( 클래스 **@Controller** 정의 )
+
+
+
+:soon:  Controller에서 해당 요청을 처리할 Service는 RequestMapping으로 찾아간다. ( 처리할 메소드를 찾아감 )
+
+​					**@RequestMapping("/success")**
+
+
+
+```java
+@RequestMapping("/success")
+public String success(Model model){
+	model.setAttribute("tempData", "model has data!!");
+}
+```
+
+- 개발자는 Model 객체에 데이터를 담아서 Dispatcher Servlet에 전달할 수 있다.
+- DispatcherServlet에 전달된 Model 데이터는 View에서 가공되어 클라이언트한테 응답처리 된다.
+
+
+
+
+
+> 사용자의 모든 요청을 DispatcherServlet이 받은 후 HandlerMapping 객체에 Controller 객체 검색을 요청한다. 그러면 HandlerMapping 객체는 프로젝트에 존재하는 모든 Controller 객체를 검색한다. HandlerMapping 객체가 Controller 객체를 검색해서 DispatcherServlet 객체에 알려주면 DispatcherServlet 객체는 다시 HandlerAdapter 객체에 사용자의 요청에 부합하는 메소드 검색을 요청한다. 그러면 HandlerAdapter 객체는 사용자의 요청에 부합하는 메소드를 찾아서 해당 Controller 객체의 메소드를 실행한다. Controller 객체의 메소드가 실행된 후 Controller 객체는 HandlerAdapter 객체에 ModelAndView 객체를 반환하는데 ModelAndView 객체에는 사용자 응답에 필요한 데이터 정보와 뷰 정보가 담겨있다. 다음으로 HandlerAdapter 객체는 ModelAndView 객체를 다시 DispatcherServlet 객체에 반환한다.
+
+
+
+
+
+![MVC 폴더 수동제작](C:\Users\user\Desktop\Spring\git\MVC 폴더 수동제작.PNG)
+
+ 		**STS를 사용하지 않고 만드는 MVC 프로젝트 폴더 구조**
+
+
+
+
 
 
 
