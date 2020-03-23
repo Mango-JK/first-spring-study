@@ -492,7 +492,7 @@ AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
 
 
 
-![Spring 설계구조](C:\Users\user\Desktop\Spring\git\Spring 설계구조.PNG)
+![Spring 설계구조](.\Spring 설계구조.PNG)
 
 
 
@@ -527,7 +527,7 @@ web.xml에 서블릿을 매핑시켜준다.
 
 
 
-![DispatcherServlet 사용](C:\Users\user\Desktop\Spring\git\DispatcherServlet 사용.PNG)
+![DispatcherServlet 사용](.\DispatcherServlet 사용.PNG)
 
 
 
@@ -567,7 +567,7 @@ public String success(Model model){
 
 
 
-![MVC 폴더 수동제작](C:\Users\user\Desktop\Spring\git\MVC 폴더 수동제작.PNG)
+![MVC 폴더 수동제작](.\MVC 폴더 수동제작.PNG)
 
  		**STS를 사용하지 않고 만드는 MVC 프로젝트 폴더 구조**
 
@@ -629,7 +629,37 @@ Spring Tool Suite (STS)를 이용해 기본적인 프로젝트를 생성합니�
 
 ### 서비스 객체 구현
 
+```java
+##	1. 스프링 설정파일을 이용한 서비스 객체 생성 및 의존성 객체 자동 주입 ##
+## 기존 bean을 선언한 뒤 Autowired를 통한 서비스 객체 구현 ##
 
+# servlet-context.xml
+<beans:bean id="service" class="com.bs.lec17.member.service.MemberService"></beans:bean>
+
+#bean을 만들어준 뒤 실제 service를 생성할 때에
+@Autowired
+MemberService service;
+
+```
+
+​		하지만 이러한 방식은 너무 복잡하고 가독성도 좋지 않음.
+
+
+
+```java
+## 2. 어노테이션을 이용해서 서비스 객체 생성 및 의존성 자동 주입 ##
+
+
+
+@Service
+public class MemberService implements IMemberService{
+	@Autowired
+	MemberService service;
+    
+}
+```
+
+​		**훨씬 간결하고 가독성이 좋은 것 같다. 앞으로는 이런 식으로 사용할 생각**
 
 
 
@@ -637,7 +667,14 @@ Spring Tool Suite (STS)를 이용해 기본적인 프로젝트를 생성합니�
 
 ### DAO 객체 구현
 
+```java
+## DAO 객체 역시 Service 객체와 유사하게 어노테이션을 이용한다 ##
 
+@Repository
+public class MemberDao implements IMemberDao {
+
+}
+```
 
 
 
