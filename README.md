@@ -577,6 +577,68 @@ public String success(Model model){
 
 
 
+## :heavy_check_mark: 17강 ( Service & Dao 객체 구현 )
+
+실제 Spring 개발을 경험하기 위해 아주 간단한 회원 정보 로그인에 관한 기초적인 Service와 Dao 객체를 구현하면서 Spring 개발을 연습합니다.
+
+
+
+### 웹 어플리케이션 준비
+
+Spring Tool Suite (STS)를 이용해 기본적인 프로젝트를 생성합니다.
+
+
+
+​		**NEW > Spring Legacy Project > Spring MVC Project**
+
+- 오류 발생 시에는 [ Project 우클릭 > Maven > Update Project ] 를 통해 잡아주도록 합니다.
+
+
+
+### 한글 처리
+
+정상적인 한글 처리를 위해서 web.xml에 Filter 코드 추가
+
+
+
+```java
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+```
+
+
+
+
+
+### 서비스 객체 구현
+
+
+
+
+
+
+
+### DAO 객체 구현
+
+
+
 
 
 
