@@ -1,4 +1,4 @@
-## 🚩 Spring 개념잡기               start _ 2020-03-17
+## df🚩 Spring 개념잡기               start _ 2020-03-17
 
 
 
@@ -492,7 +492,7 @@ AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
 
 
 
-![Spring 설계구조](C:\Users\user\Desktop\Spring\git\Spring 설계구조.PNG)
+![Spring 설계구조](./Spring 설계구조.PNG)
 
 
 
@@ -527,7 +527,7 @@ web.xml에 서블릿을 매핑시켜준다.
 
 
 
-![DispatcherServlet 사용](C:\Users\user\Desktop\Spring\git\DispatcherServlet 사용.PNG)
+![DispatcherServlet 사용](./DispatcherServlet 사용.PNG)
 
 
 
@@ -567,7 +567,7 @@ public String success(Model model){
 
 
 
-![MVC 폴더 수동제작](C:\Users\user\Desktop\Spring\git\MVC 폴더 수동제작.PNG)
+![MVC 폴더 수동제작](./MVC 폴더 수동제작.PNG)
 
  		**STS를 사용하지 않고 만드는 MVC 프로젝트 폴더 구조**
 
@@ -575,11 +575,119 @@ public String success(Model model){
 
 
 
+## :heavy_check_mark: 17강 ( Service & Dao 객체 구현 )
+
+
+
+STS에서 새 프로젝트 생성 ( **New -> Legacy Spring Project -> Spring MVC Project** )
+
+
+
+![Korean Error](./Korean Error.PNG)
+
+ 
+
+Spring에서 한글 깨짐을 방지해주기 위해서 web.xml에 encodingFilter 코드를 추가한다.
+
+
+
+```java
+# web.xml 
+
+<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+```
 
 
 
 
 
+![Spring Filter](./Spring Filter.PNG)
+
+
+
+
+
+### :pushpin: ​Controller 에서 서비스 객체를 구현하는 3가지 방법
+
+
+
+####  1. new 연산자를 이용한 service 객체 생성 및 참조
+
+```
+MemberService service = new MemberService();
+```
+
+
+
+
+
+#### 2. 스프링 설정파일을 이용한 서비스 객체 생성 및 의존 객체 자동 주입
+
+```java
+# bean 생성을 위한 servlet-context.xml 내부 소스
+<beans:bean id="service" class="com.ho.ch09.member.service.MemberService"></beans:bean>
+
+
+# Controller 내부 서비스 객체 구현
+
+@Autowired
+MemberService service;
+```
+
+
+
+
+
+#### 3. 어노테이션을 이용해서 서비스 객체 생성 및 의존 객체 자동 주입
+
+Service 객체에다가 Service로 쓰일 객체라고 명시해준다
+
+```java
+# Service 대신 @Repository("memberService")로 명시도 가능
+
+@Service
+public class MemberService implements IMemberService{
+	
+}
+```
+
+
+
+
+
+
+
+### :pushpin:  어노테이션을 이용하여 DAO 객체를 주입하는 방법
+
+```java
+어노테이션을 이용해서 DAO 객체 생성 및 의존 객체 자동 주입
+@Repository
+public class MemberDao implements IMemberDao {
+
+}
+
+이후 사용하고자 하는 곳에서 어노테이션을 이용하여 주입
+@Autowired
+MemberDao dao;
+```
 
 
 
