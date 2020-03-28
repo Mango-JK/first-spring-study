@@ -1,4 +1,4 @@
-## df🚩 Spring 개념잡기               start _ 2020-03-17
+## 🚩 Spring 개념잡기               start _ 2020-03-17
 
 
 
@@ -8,7 +8,7 @@
 
 
 
-
+​	
 
 ## :heavy_check_mark: 4강 ( pom.xml 정의, applicationContext, Bean )
 
@@ -690,4 +690,159 @@ MemberDao dao;
 ```
 
 
+
+
+
+
+
+## :heavy_check_mark: 18강 ( Controller 객체 구현 )
+
+
+
+### @RequestMapping을 이용한 URL 맵핑
+
+
+
+**공통적으로 사용되는 URL을 관리해주기 위해**
+
+​	**Controller에서도 RequestMapping을 사용한다.**
+
+
+
+```java
+
+# MemberController를 사용하는 경우 "/member/Join", "/member/login" 등
+# 중복되는 /member/ 를 RequestMapping을 사용하여 중복을 방지해준다.
+
+@Controller
+@RequestMapping("/member/")
+public class MemberController{
+	
+}
+
+
+```
+
+
+
+
+
+### 커맨드 객체 사용하기
+
+커맨드 객체를 사용하면 더 가독성이 좋고 편리한 코드를 작성할 수 있다.
+
+​	( 작성하는 코드의 양이 줄어든다. )
+
+
+
+```java
+#  Controller에서, 기존의 HttpServletRequest request와
+#	request.getParameter("memId") 이런 식으로 사용하지 않고
+
+public String memJoin(Member member){
+
+	// 이런식으로 member 이름과 getter/setter를 사용하여 작성할 수 있다.
+	service.memRegister(member.getMemId(), member.getMemPw());
+	
+
+}
+```
+
+
+
+
+
+```html
+# View를 담당하는 jsp에서도 역시 member 객체를 통해 값을 전달받는다
+
+ID : ${member.memId}
+PW : ${member.memPw}
+...
+    
+```
+
+
+
+
+
+
+
+### @ModelAttribute
+
+필요 시에는 **커맨드 객체**의 이름을 바꿔서 사용할 수도 있다.
+
+
+
+```java
+@RequestMapping(value="/memJoin")
+public String memJoin(@ModelAttribute("mem") Member member){
+	...
+}
+```
+
+
+
+ModelAttributes를 이용하면 컨트롤러 내에서 
+
+​	공통적으로 어느 메소드이든 그 안에서 사용되도록 할 수 있다.
+
+
+
+```java
+# 이 경우에 serverTime은 어느 화면에서든지 모두 사용할 수 있다.
+
+public class MemberController{
+
+	@Autowired
+	MemberService service;
+	
+	@ModelAttributes("serverTime"){
+		Date date = new Date();
+		Dateformat dateFormat = DateFormat.getDateTimeInstance(DateFormat.Long ... )
+		return dateFormat.format(date);
+	}
+}
+
+
+
+# memRemoveOK.jsp 에서...
+    
+    <h1> ${serverTime} </h1>
+  
+ 이런 식으로 Controller 내 모든 메소드에서 serverTime이 사용 가능
+```
+
+
+
+
+
+
+
+### Model & ModelAndView
+
+*****  컨트롤러에서 뷰에 데이터를 전달하기 위해 사용하는 객체로 Model 과 ModelAndView가 있다. 두 객체의 차이점은 Model은 뷰에 데이터만을 전달하기 위한 객체이고, ModelAndView는 데이터와 뷰의 이름을 함께 전달하는 객체이다.
+
+
+
+
+
+
+
+```java
+# ModelAndView 사용해보기
+
+@RequestMapping(value = "/memModify", method = RequestMethod.POST)
+public ModelAndView memModify(Member member){
+
+	Member[] members = service.memberModify(member);
+	
+	ModelAndView mav = new ModelAndView();
+	mav.addObject("memBef", members[0]);
+	mav.addObject("memAft", members[1]);
+	
+	mav.serViewName("memModifyOk");
+	
+	return mav;
+}
+```
 

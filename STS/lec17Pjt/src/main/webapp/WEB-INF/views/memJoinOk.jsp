@@ -7,10 +7,10 @@
 </head>
 <body>
 	<h1>mem Join OK !! </h1>
-	ID : ${memId} <br />
-	PW : ${memPw} <br />
-	Mail : ${memMail} <br />
-	Phone : ${memPhone} <br />
+	ID : ${mem.memId} <br />
+	PW : ${mem.memPw} <br />
+	Mail : ${mem.memMail} <br />
+	Phone : ${mem.memPhone1} <br />
 	
 	<a href="/lec17/resources/memJoin.html"> Go MemberJoin </a>
 </body>
