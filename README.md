@@ -782,7 +782,7 @@ public String memJoin(@ModelAttribute("mem") Member member){
 
 
 
-ModelAttributes를 이용하면 컨트롤러 내에서 
+ModelAttribute를 이용하면 컨트롤러 내에서 
 
 ​	공통적으로 어느 메소드이든 그 안에서 사용되도록 할 수 있다.
 
@@ -796,7 +796,7 @@ public class MemberController{
 	@Autowired
 	MemberService service;
 	
-	@ModelAttributes("serverTime"){
+	@ModelAttribute("serverTime"){
 		Date date = new Date();
 		Dateformat dateFormat = DateFormat.getDateTimeInstance(DateFormat.Long ... )
 		return dateFormat.format(date);
@@ -845,4 +845,220 @@ public ModelAndView memModify(Member member){
 	return mav;
 }
 ```
+
+
+
+
+
+
+
+## :heavy_check_mark: 20강 ( 세션, 쿠키 )
+
+
+
+### 세션과 쿠키
+
+**세션**은 **서버**에서 연결 정보를 관리하는 반면, 
+
+​			**쿠키**는 **클라이언트**에서 연결 정보를 관리한다.
+
+
+
+### HttpSession을 이용한 세션 사용
+
+
+
+
+
+```java
+# Controller에서 HttpSession을 이용한 Session 구현
+@RequestMapping(value = "/login", method = RequestMethod.POST)
+public String memLogin(Member member, HttpSession session){
+	Member mem = service.memberSearch(member);
+	
+	session.setAttribute("member", mem);
+	
+	return "/member/LoginOk";
+}
+
+
+# 세션에 담아둔 정보를 사용하는 경우
+@RequestMapping(value = "/modifyForm", method = RequestMethod.GET)
+public ModelAndView modifyForm(HttpServletRequest request){
+    HttpSession session = request.getSession();
+    Member member = (Member) session.getAttribute("member");
+    
+    ModelAndView mav = new ModelAndView();
+    mav.addObject("member", service.memberSearch(member));
+    
+    mav.setViewName("/member/modifyForm");
+    
+    return mav;
+}
+
+# 세션 삭제 시
+HttpSession session = request.getSession();
+session.invalidate();
+```
+
+
+
+**세션을 삭제**할 경우에는 ( 로그아웃, 회원탈퇴 등 )
+
+#### 			session.invalidate(); 
+
+​	이용한다.
+
+
+
+
+
+
+
+### 쿠키
+
+- mallMain()에서 쿠키를 생성하고, 파라미터로 받은 HttpServletResponse에 쿠키를 담고 있다.
+- 쿠키를 생성할 때는 두 개의 파라미터를 넣어주는데 첫 번째는 쿠키 이름을 넣어주고, 두 번째는 쿠키값을 넣어준다.
+
+
+
+```java
+# 쿠키를 만들어 사용하는 방법
+    
+@RequestMapping("/main")
+public String mallMain(Mall mall, HttpServletResponse response){
+    
+    Cookie genderCookie = new Cookie("gender", mall.getGender());
+    
+    if(mall.isCookieDel()){
+        genderCookie.setMaxAge(0);
+        mall.setGender(null);
+    } else {
+        genderCookie.setmaxAge(60*60*24*30);
+    }
+    response.addCookie(genderCookie);
+    
+    return "/mall/main";
+}
+
+
+# CookieValue 사용하기
+@RequestMapping("/index")
+public String mallIndex(Mall mall, @CookieValue(value="gender", required=false) Cookie genderCookie, HttpServletRequest request){
+    if(genderCookie != null)
+        mall.setGender(genderCookie.getValue());
+    
+    return "/mall/index";
+}
+```
+
+
+
+
+
+
+
+## :heavy_check_mark: 21강 ( 리다이렉트, 인터셉터 )
+
+
+
+예를 들어, 회원의 정보를 수정하는 화면이 있다고 생각하자.
+
+세션에 회원의 정보가 존재한다면 해당 페이지로 이동시켜주면 되겠지만,
+
+#####  회원 정보가 존재하지 않는 경우에는 ( 간혹 *url에 직접 입력을 통해 들어오는 경우* )
+
+  해당 페이지로 접근하지 않도록 처리해주어야 한다.
+
+
+
+
+
+리다이렉트 기능을 이용하여 세션에 **회원 정보가 존재**한다면 -> **회원 정보 페이지**로, 
+
+​		세션에 **회원 정보가 존재하지 않는다면** -> **메인 페이지**로 이동하도록 해보자.
+
+
+
+
+
+```java
+@RequestMapping(value="/modifyForm")
+public String modifyForm(Model model, HttpServletRequest request){
+	HttpSession session = request.getSession();
+	Member member = (Member) session.getAttribute("member");
+	
+	if(member == null){
+		return "redirect:/";
+	} else {
+        model.setAttribute("member", service.memberSearch(member));
+    }
+	
+	return "/member/modifyForm";
+}
+```
+
+
+
+
+
+## 데이터베이스
+
+- #### Oracle 설치
+
+
+
+- #### 기본 명령어 사용
+
+```sql
+# <scott> : <tiger> User 만들기
+create user scott identified by tiger;
+
+# scott계정에 connect, resource 권한 주기
+grant connect, resource to scott;
+
+# 계정 나가기 ( 다시 cmd 위치로 돌아감 )
+exit
+
+# 계정 지우기
+drop user scott cascade;
+
+
+```
+
+
+
+
+
+- #### Oracle SQL developer 설치
+
+이전 실습에서 만들어두었던 scott, tiger로 <새 접속>을 눌러 접속해보자.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
