@@ -1046,7 +1046,245 @@ drop user scott cascade;
 
 
 
+## :heavy_check_mark: 22강 ( JDBC )
 
+
+
+Oracle에 기본적인 테이블을 만들고 JDBC를 이용해보도록 하겠습니다.
+
+
+
+```sql
+
+# member 테이블생성 
+CREATE TABLE member( memId VARCHAR2(10) CONSTRAINT memId_pk PRIMARY KEY, 
+                    memPw VARCHAR2(10), 
+                    memMail VARCHAR2(15), 
+                    memPurcNum NUMBER(3) DEFAULT 0 CONSTRAINT memPurNum_ck CHECK(memPurcNum < 3) );
+                    
+# member 테이블에 ‘b’계정을 삽입한다.
+INSERT INTO member (memId, memPw, memMail) values ('b', 'bb', 'bbb@gmail.com');
+
+# member 테이블의 모든 회원정보를 출력한다.
+SELECT * FROM member;
+
+# member 테이블에서 ‘memId’가 ‘b’인 회원을 삭제한다.
+DELETE FROM member WHERE memId = 'b';
+
+# member 테이블을 삭제한다.
+DROP TABLE member;
+```
+
+
+
+
+
+### JDBC 실행 순서
+
+
+
+#### 			드라이버 로딩  -->  DB 연결  -->  SQL 작성 및 전송  -->  자원해제
+
+------
+
+
+
+
+
+
+
+### 기존 코드를 Oracle과 연동하여 JDBC 구현하기
+
+
+
+
+
+```java
+@Repository
+public class MemberDao implements IMemberDao {
+
+	private String driver = "oracle.jdbc.driver.OracleDriver";
+	private String url = "jdbc:oracle:thin:@DESKTOP-KVCQHCD:1521:system";
+	private String userid = "SYSTEM";
+	private String userpw = "oracle";
+	
+	private Connection conn = null;
+	private PreparedStatement pstmt = null;
+	private ResultSet rs = null;
+    
+    ...
+        
+}
+```
+
+
+
+
+
+
+
+
+
+```java
+# 기존의 MemberDao Insert JDBC로 구현하기
+
+	@Override
+	public int memberInsert(Member member) {
+
+		int result = 0;
+
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, userid, userpw);
+			String sql = "INSERT INTO MEMBER (memId, memPw, memMail) values (?, ?, ?)";
+			pstmt.setString(1, member.getMemId());
+			pstmt.setString(2, member.getMemPw());
+			pstmt.setString(3, member.getMemMail());
+			result = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+//		dbMap.put(member.getMemId(), member);
+		return result;
+	}
+
+
+
+# 연결되어 있는 MemberService 클래스에서 memberRegister 메소드 수정
+    
+    @Service
+public class MemberService implements IMemberService {
+	
+	@Autowired
+	MemberDao dao;
+	
+	@Override
+	public void memberRegister(Member member) {
+//		printMembers(dao.memberInsert(member));
+		
+		int result = dao.memberInsert(member);
+		
+		if(result == 0) {
+			System.out.println("Join Fail");
+		} else {
+			System.out.println("Join Success");
+		}
+	}
+}
+```
+
+
+
+
+
+
+
+이렇게 JDBC를 구현하는 경우에는 매번 중복된 코드가 발생한다.
+
+
+
+DB를 연결하고, SQL문을 준비하고 실행문을 작성하면서 (Conn, pstmt, rs ... ) 중복된 코드를 계속 작성하는 것은
+
+
+
+비효율적이기 때문에 **JDBC Template**를 사용하여 중복을 없애보도록 하자.
+
+
+
+
+
+
+
+## :heavy_check_mark: 24강 ( JdbcTemplate )
+
+JDBC를 이용할 때 매번 Connection 객체를 만들어주고, 드라이버를 로딩하는 것 등 반복되는 코드를 작성해야만 했다.
+
+
+
+스프링에서 이를 해결하기 위해 JdbcTemplate이라는 것을 제공한다.
+
+
+
+
+
+### JDBC의 단점을 보완한 JdbcTemplate
+
+
+
+기존의 **JDBC**는 [ **드라이버 로딩 -> DB 연결 -> SQL 작성 및 전송 -> 자원해제**  ] 의 과정을 거쳤지만
+
+
+
+**JdbcTemplate** 은 [ **JdbcTemplate**(드라이버 로딩,  DB연결, 자원해제)  <--> **SQL 작성 및 전송** ]
+
+​		훨씬 더 효율적인 구조를 가진다.
+
+
+
+ 
+
+
+
+### DataSource 클래스
+
+- 데이터베이스 연결과 관련된 정보를 가지고 있는 DataSource는
+
+  스프링 또는 c3p0에 제공하는 클래스를 이용할 수 있다.
+
+
+
+
+
+#### 													**스프링**
+
+```java
+org.springframework.jdbc.datasource.DriverManagerDataSource
+```
+
+
+
+
+
+
+
+### 										DataSource 사용하기
+
+```java
+# MemberDao 클래스 내에 기본 생성자를 만들고, JDBC 정보를 담는 template를 만들어준다.
+
+public MemberDao(){
+	dataSource = new DriverManagerDataSource();
+	dataSource.setDriverClass(driver);
+	dataSource.setJdbcUrl(url);
+	dataSource.setPassword(userPw);
+	
+	template = new JdbcTemplate();
+	template.setDataSource(dataSource);
+}
+
+
+# 이후 훨씬 간결하게 Dao 메소드를 만들 수 있다.
+
+@Override
+public int memberInsert(Member member){
+	int result = 0;
+	
+	String sql = "INSERT INTO member (memId, memPw, memMail) value (?, ?, ?)";
+	result = template.Update(sql, member.getMemId(), member.getMemPw(), member.getMemMail());
+	
+	return result;
+}
+```
 
 
 
