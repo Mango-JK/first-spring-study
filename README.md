@@ -8,7 +8,7 @@
 
 
 
-​	
+
 
 ## :heavy_check_mark: 4강 ( pom.xml 정의, applicationContext, Bean )
 
@@ -58,7 +58,7 @@
 
 이곳에서 기본 pom.xml파일에 
 
-두 가지,  org.springframework와 maven-compiler-plugin을 추가해주었다.
+두 가지,  spring-context와 maven-compiler-plugin을 추가해주었다.
 
 
 
@@ -1293,10 +1293,6 @@ public int memberInsert(Member member){
 
 
 
-
-
-
---git 되돌리기
 
 
 
